@@ -15,12 +15,9 @@ class SistemaSeguros
         { "0942091399", "Miguel Flores"  },
         { "0942091390", "Diana Arreaga"  }
     };
+
     static string[] JA_Ramos =
-    {
-        "Incendio",
-        "Robo",
-        "Vehiculo",
-        "Trasporte"
+    {    "Incendio", "Robo", "Vehiculo", "Trasporte"
     };
 
     static int[][] Ja_AlertasUAF =
@@ -36,6 +33,7 @@ class SistemaSeguros
         new int[] { 999, 404      },
         new int[] { 200, 500, 200 }
     };
+
     const int Ja_MaxPolizas = 100;
     static int[] Ja_PolCliente = new int[Ja_MaxPolizas];
     static string[] Ja_PolRamo = new string[Ja_MaxPolizas];
@@ -50,6 +48,8 @@ class SistemaSeguros
     static double[] Ja_SinPagoNeto = new double[Ja_MaxSiniestros];
     static double[] Ja_SinCapConsumido = new double[Ja_MaxSiniestros];
     static int Ja_TotalSiniestros = 0;
+    static string[] Ja_SinEstado = new string[Ja_MaxSiniestros];
+
 
     static void Main(string[] args)
     {
@@ -59,7 +59,7 @@ class SistemaSeguros
         while (Ja_Continuar)
         {
             Console.WriteLine("========================================");
-            Console.WriteLine("SISTEMA INTEGRAL DE SEGUROS (xJorsCorp)");
+            Console.WriteLine("SISTEMA INTEGRAL DE SEGUROS (SIS)");
             Console.WriteLine("========================================");
             Console.WriteLine("1. Emitir nueva póliza");
             Console.WriteLine("2. Registrar siniestro");
@@ -73,15 +73,10 @@ class SistemaSeguros
             {
                 switch (ja_opcion)
                 {
-                    case 1:
-                        EmitirPoliza();
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        break;
-                    case 4:
-                        break;
+                    case 1: EmitirPoliza(); break;
+                    case 2: RegistarSiniestro(); break;
+                    case 3: break;
+                    case 4: break;
                     case 5:
                         Console.WriteLine("Saliendo del sistema de xJorsCorp...");
                         Ja_Continuar = false;
@@ -97,7 +92,6 @@ class SistemaSeguros
             }
         }
     }
-
 
     static void EmitirPoliza()
     {
@@ -121,14 +115,8 @@ class SistemaSeguros
                 Console.ResetColor();
                 ja_ValdContinuar = true;
             }
-            else if (Ja_Continuar == 's')
-            {
-                ja_ValdContinuar = true;
-            }
-            else
-            {
-                ja_ValdContinuar = false;
-            }
+            else if (Ja_Continuar == 's') { ja_ValdContinuar = true; }
+            else { ja_ValdContinuar = false; }
 
             if (Ja_Continuar == 's')
             {
@@ -168,7 +156,6 @@ class SistemaSeguros
                         Console.WriteLine("Cliente no encontrado");
                         Console.ResetColor();
                     }
-
                 } while (!Ja_ValdCedula);
 
                 bool Ja_PolDuplicada = false;
@@ -187,7 +174,7 @@ class SistemaSeguros
                     Console.WriteLine("AVISO: El cliente ya posee una póliza registrada.");
                     Console.WriteLine("No es posible emitir una segunda póliza para el mismo cliente.");
                     Console.ResetColor();
-                    continue;   
+                    continue;
                 }
 
                 Ja_Bloqueo = false;
@@ -201,7 +188,6 @@ class SistemaSeguros
                         Console.ResetColor();
                         continue;
                     }
-
                     if (Ja_codigo == 999)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -212,18 +198,13 @@ class SistemaSeguros
                     }
                 }
 
-                if (Ja_Bloqueo)
-                {
-                    continue;
-                }
+                if (Ja_Bloqueo) { continue; }
 
                 if (!Ja_Bloqueo)
                 {
                     Console.WriteLine("RAMOS DISPONIBLES");
                     for (int Ja_i = 0; Ja_i < JA_Ramos.Length; Ja_i++)
-                    {
                         Console.WriteLine($"{Ja_i + 1}. {JA_Ramos[Ja_i]}");
-                    }
 
                     int Ja_OpcionRamo;
                     bool Ja_ValdRamo;
@@ -243,7 +224,6 @@ class SistemaSeguros
 
                     string Ja_RamoSeleccionado = JA_Ramos[Ja_OpcionRamo - 1];
 
-                    // ── Capital asegurado ─────────────────────────────────────
                     double Ja_Capital;
                     bool Ja_ValdCapital;
 
@@ -260,7 +240,6 @@ class SistemaSeguros
                         }
                     } while (!Ja_ValdCapital || Ja_Capital <= 0);
 
-                    // ── Tasa de riesgo ────────────────────────────────────────
                     double Ja_Tasa;
                     bool Ja_ValdTasa;
 
@@ -282,28 +261,20 @@ class SistemaSeguros
                     double Ja_SeguroCampesino = Ja_PrimaBase * 0.005;
 
                     double Ja_DerechoEmision;
-                    if (Ja_Capital > 0 && Ja_Capital <= 10000)
-                        Ja_DerechoEmision = 0.50;
-                    else if (Ja_Capital <= 40000)
-                        Ja_DerechoEmision = 1.00;
-                    else
-                        Ja_DerechoEmision = 2.00;
+                    if (Ja_Capital > 0 && Ja_Capital <= 10000) Ja_DerechoEmision = 0.50;
+                    else if (Ja_Capital <= 40000) Ja_DerechoEmision = 1.00;
+                    else Ja_DerechoEmision = 2.00;
 
-                    double Ja_Subtotal = Ja_PrimaBase + Ja_SuperBancos +
-                                         Ja_SeguroCampesino + Ja_DerechoEmision;
+                    double Ja_Subtotal = Ja_PrimaBase + Ja_SuperBancos + Ja_SeguroCampesino + Ja_DerechoEmision;
                     double Ja_IVA = Ja_Subtotal * 0.12;
                     double Ja_Total = Ja_Subtotal + Ja_IVA;
 
                     Ja_PolCliente[Ja_TotalPolizas] = Ja_FilaCliente;
-
                     Ja_PolRamo[Ja_TotalPolizas] = Ja_RamoSeleccionado;
                     Ja_PolCapital[Ja_TotalPolizas] = Ja_Capital;
-
                     Ja_PolCapRemte[Ja_TotalPolizas] = Ja_PolCapital[Ja_TotalPolizas];
-
                     Ja_PolPrimaTotal[Ja_TotalPolizas] = Ja_Total;
-
-                    Ja_TotalPolizas++;   
+                    Ja_TotalPolizas++;
 
                     int Ja_IdxGuardado = Ja_TotalPolizas - 1;
 
@@ -327,7 +298,192 @@ class SistemaSeguros
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("\nPÓLIZA GENERADA CON ÉXITO");
                     Console.ResetColor();
+                    Console.WriteLine($"Pólizas en memoria: {Ja_TotalPolizas} / {Ja_MaxPolizas}");
                 }
+            }
+        } while (ja_ValdContinuar);
+    }
+
+    static void RegistarSiniestro()
+    {
+        char Ja_Continuar;
+        bool ja_ValdContinuar = false;
+        string Ja_cedula;
+        int Ja_IdxPoliza = -1;
+        bool Ja_PolEncontrada;
+
+        do
+        {
+            Console.WriteLine("Desea registrar un siniestro (s/n):");
+            bool ja_ValdSN = char.TryParse(Console.ReadLine().ToLower(), out Ja_Continuar);
+
+            if (ja_ValdSN == false || (Ja_Continuar != 's' && Ja_Continuar != 'n'))
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Opcion incorrecta, intente nuevamente");
+                Console.ResetColor();
+                ja_ValdContinuar = true;
+            }
+            else if (Ja_Continuar == 's') { ja_ValdContinuar = true; }
+            else { ja_ValdContinuar = false; }
+
+            if (Ja_Continuar == 's')
+            {
+                if (Ja_TotalSiniestros >= Ja_MaxSiniestros)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"ERROR: Se alcanzó el límite máximo de {Ja_MaxSiniestros} siniestros en memoria.");
+                    Console.WriteLine("No es posible registrar más siniestros en esta sesión.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                Console.WriteLine("Ingrese el numero de cedula del cliente:");
+                Ja_cedula = Console.ReadLine();
+                Ja_PolEncontrada = false;
+                Ja_IdxPoliza = -1;
+
+                for (int Ja_i = 0; Ja_i < Ja_TotalPolizas; Ja_i++)
+                {
+                    if (Ja_Clientes[Ja_PolCliente[Ja_i], 0] == Ja_cedula)
+                    {
+                        Ja_PolEncontrada = true;
+                        Ja_IdxPoliza = Ja_i;
+                        break;
+                    }
+                }
+
+                if (!Ja_PolEncontrada)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("No existe una póliza registrada para este cliente.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Póliza encontrada");
+                Console.ResetColor();
+                Console.WriteLine("----------------------------------------------");
+                Console.WriteLine($"Cliente:\t\t{Ja_Clientes[Ja_PolCliente[Ja_IdxPoliza], 1]}");
+                Console.WriteLine($"Cédula:\t\t\t{Ja_Clientes[Ja_PolCliente[Ja_IdxPoliza], 0]}");
+                Console.WriteLine($"Ramo:\t\t\t{Ja_PolRamo[Ja_IdxPoliza]}");
+                Console.WriteLine($"Capital Asegurado:\t${Ja_PolCapital[Ja_IdxPoliza]:F2}");
+                Console.WriteLine($"Capital Remanente:\t${Ja_PolCapRemte[Ja_IdxPoliza]:F2}");
+                Console.WriteLine("----------------------------------------------");
+
+                double Ja_MontoReclamo;
+                bool Ja_ValdMonto;
+
+                do
+                {
+                    Console.Write("Ingrese el monto del reclamo: ");
+                    Ja_ValdMonto = double.TryParse(Console.ReadLine(), out Ja_MontoReclamo);
+
+                    if (!Ja_ValdMonto || Ja_MontoReclamo <= 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Monto inválido. Debe ser un valor mayor a cero.");
+                        Console.ResetColor();
+                    }
+                } while (!Ja_ValdMonto || Ja_MontoReclamo <= 0);
+
+                if (Ja_MontoReclamo > Ja_PolCapRemte[Ja_IdxPoliza])
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("ERROR: El reclamo excede el capital remanente disponible.");
+                    Console.WriteLine($"Capital Remanente disponible: ${Ja_PolCapRemte[Ja_IdxPoliza]:F2}");
+                    Console.ResetColor();
+
+                    Ja_SinPoliza[Ja_TotalSiniestros] = Ja_IdxPoliza;
+                    Ja_SinMontoReclamo[Ja_TotalSiniestros] = Ja_MontoReclamo;
+                    Ja_SinDeducible[Ja_TotalSiniestros] = 0;   
+                    Ja_SinPagoNeto[Ja_TotalSiniestros] = 0;   
+                    Ja_SinCapConsumido[Ja_TotalSiniestros] = 0;   
+                    Ja_SinEstado[Ja_TotalSiniestros] = "Rechazado";   
+
+                    Ja_TotalSiniestros++;   
+
+                    int Ja_IdxRechazado = Ja_TotalSiniestros - 1;
+
+                    Console.Clear();
+                    Console.WriteLine("\n==============================================");
+                    Console.WriteLine("\t  COMPROBANTE DE SINIESTRO");
+                    Console.WriteLine("==============================================");
+                    Console.WriteLine($"\nCliente:\t\t{Ja_Clientes[Ja_PolCliente[Ja_IdxPoliza], 1]}");
+                    Console.WriteLine($"Cédula:\t\t\t{Ja_Clientes[Ja_PolCliente[Ja_IdxPoliza], 0]}");
+                    Console.WriteLine($"Ramo:\t\t\t{Ja_PolRamo[Ja_IdxPoliza]}");
+                    Console.WriteLine("\nDETALLE DEL SINIESTRO");
+                    Console.WriteLine($"Capital Original:\t${Ja_PolCapital[Ja_IdxPoliza]:F2}");
+                    Console.WriteLine($"Capital Remanente:\t${Ja_PolCapRemte[Ja_IdxPoliza]:F2}");
+                    Console.WriteLine("----------------------------------------------");
+                    Console.WriteLine($"Monto Reclamado:\t${Ja_SinMontoReclamo[Ja_IdxRechazado]:F2}");
+                    Console.WriteLine($"Deducible (%):\t\t{Ja_SinDeducible[Ja_IdxRechazado]:F2}%");
+                    Console.WriteLine($"Valor Deducible ($):\t${0:F2}");
+                    Console.WriteLine($"Monto Pagado:\t\t${Ja_SinPagoNeto[Ja_IdxRechazado]:F2}");
+                    Console.WriteLine("----------------------------------------------");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Estado:\t\t\t{Ja_SinEstado[Ja_IdxRechazado]}");
+                    Console.ResetColor();
+                    Console.WriteLine($"Siniestros en memoria: {Ja_TotalSiniestros} / {Ja_MaxSiniestros}");
+
+                    continue;   
+                }
+
+                double Ja_PorcDeducible;
+                bool Ja_ValdDeducible;
+
+                do
+                {
+                    Console.Write("Ingrese el porcentaje de deducible (0 - 100): ");
+                    Ja_ValdDeducible = double.TryParse(Console.ReadLine(), out Ja_PorcDeducible);
+
+                    if (!Ja_ValdDeducible || Ja_PorcDeducible < 0 || Ja_PorcDeducible > 100)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Deducible inválido. Debe estar entre 0 y 100.");
+                        Console.ResetColor();
+                    }
+                } while (!Ja_ValdDeducible || Ja_PorcDeducible < 0 || Ja_PorcDeducible > 100);
+
+                double Ja_ValorDeducible = Ja_MontoReclamo * (Ja_PorcDeducible / 100);
+                double Ja_MontoAPagar = Ja_MontoReclamo - Ja_ValorDeducible;
+                double Ja_MontoConsumido = Ja_MontoReclamo;
+
+                Ja_PolCapRemte[Ja_IdxPoliza] = Ja_PolCapRemte[Ja_IdxPoliza] - Ja_MontoConsumido;
+
+                Ja_SinPoliza[Ja_TotalSiniestros] = Ja_IdxPoliza;
+                Ja_SinMontoReclamo[Ja_TotalSiniestros] = Ja_MontoReclamo;
+                Ja_SinDeducible[Ja_TotalSiniestros] = Ja_PorcDeducible;
+                Ja_SinPagoNeto[Ja_TotalSiniestros] = Ja_MontoAPagar;
+                Ja_SinCapConsumido[Ja_TotalSiniestros] = Ja_MontoConsumido;
+
+                Ja_SinEstado[Ja_TotalSiniestros] = "Aprobado";
+
+                Ja_TotalSiniestros++;  
+                int Ja_IdxGuardado = Ja_TotalSiniestros - 1;
+
+                Console.Clear();
+                Console.WriteLine("\n==============================================");
+                Console.WriteLine("\t  COMPROBANTE DE SINIESTRO");
+                Console.WriteLine("==============================================");
+                Console.WriteLine($"\nCliente:\t\t{Ja_Clientes[Ja_PolCliente[Ja_IdxPoliza], 1]}");
+                Console.WriteLine($"Cédula:\t\t\t{Ja_Clientes[Ja_PolCliente[Ja_IdxPoliza], 0]}");
+                Console.WriteLine($"Ramo:\t\t\t{Ja_PolRamo[Ja_IdxPoliza]}");
+                Console.WriteLine("\nDETALLE DEL SINIESTRO");
+                Console.WriteLine($"Capital Original:\t${Ja_PolCapital[Ja_IdxPoliza]:F2}");
+                Console.WriteLine($"Capital Remanente:\t${Ja_PolCapRemte[Ja_IdxPoliza]:F2}");
+                Console.WriteLine("----------------------------------------------");
+                Console.WriteLine($"Monto Reclamado:\t${Ja_SinMontoReclamo[Ja_IdxGuardado]:F2}");
+                Console.WriteLine($"Deducible (%):\t\t{Ja_SinDeducible[Ja_IdxGuardado]:F2}%");
+                Console.WriteLine($"Valor Deducible ($):\t${Ja_ValorDeducible:F2}");
+                Console.WriteLine($"Monto Pagado:\t\t${Ja_SinPagoNeto[Ja_IdxGuardado]:F2}");
+                Console.WriteLine("----------------------------------------------");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Estado:\t\t\t{Ja_SinEstado[Ja_IdxGuardado]}");
+                Console.ResetColor();
+                Console.WriteLine($"Siniestros en memoria: {Ja_TotalSiniestros} / {Ja_MaxSiniestros}");
             }
 
         } while (ja_ValdContinuar);
