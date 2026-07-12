@@ -36,7 +36,7 @@ class SistemaSeguros
         new int[] { 200, 500, 200 }
     };
 
-
+    // Arreglos donde se guardan las pólizas emitidas
     const int Ja_MaxPolizas = 100;
     static int[] Ja_PolCliente = new int[Ja_MaxPolizas];
     static string[] Ja_PolRamo = new string[Ja_MaxPolizas];
@@ -44,6 +44,8 @@ class SistemaSeguros
     static double[] Ja_PolCapRemte = new double[Ja_MaxPolizas];
     static double[] Ja_PolPrimaTotal = new double[Ja_MaxPolizas];
     static int Ja_TotalPolizas = 0;
+
+    // Arreglos donde se guardan los siniestros registrados
     const int Ja_MaxSiniestros = 200;
     static int[] Ja_SinPoliza = new int[Ja_MaxSiniestros];
     static double[] Ja_SinMontoReclamo = new double[Ja_MaxSiniestros];
@@ -53,6 +55,7 @@ class SistemaSeguros
     static int Ja_TotalSiniestros = 0;
     static string[] Ja_SinEstado = new string[Ja_MaxSiniestros];
 
+    // Información de las reaseguradoras
     static int[] Ja_CodigoReaseguradora = { 1, 2, 3, 4, 5, 6, 7 };
     static string[] Ja_NombreReaseguradora = { "Seguros Pichincha", "Equinoccial Seguros", "Latina Seguros", "Hispana Re", "Confianza Seguros", "Continental Re", "Retencion" };
     static int[] Ja_TipoGrupo = { 1, 2, 1, 1, 2, 2, 3 };
@@ -68,6 +71,7 @@ class SistemaSeguros
 
         while (Ja_Continuar)
         {
+            // Menú principal del sistema
             Console.WriteLine("========================================");
             Console.WriteLine("SISTEMA INTEGRAL DE SEGUROS (SIS)");
             Console.WriteLine("========================================");
@@ -81,6 +85,7 @@ class SistemaSeguros
 
             if (Ja_Vld && (ja_opcion >= 1 && ja_opcion <= 5))
             {
+                // Ejecuta la opción elegida por el usuario
                 switch (ja_opcion)
                 {
                     case 1: EmitirPoliza(); break;
@@ -103,6 +108,7 @@ class SistemaSeguros
         }
     }
 
+    //Metodo para emitir una poliza
     static void EmitirPoliza()
     {
         string Ja_cedula;
@@ -114,6 +120,7 @@ class SistemaSeguros
 
         do
         {
+            // Pregunta si el usuario desea emitir una poliza
             Console.WriteLine("Desea generar una poliza (s/n):");
             bool ja_ValdSN = char.TryParse(Console.ReadLine().ToLower(), out Ja_Continuar);
 
@@ -130,6 +137,7 @@ class SistemaSeguros
 
             if (Ja_Continuar == 's')
             {
+                //Revisa si hay espacio para emitir una poliza
                 if (Ja_TotalPolizas >= Ja_MaxPolizas)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -145,6 +153,7 @@ class SistemaSeguros
                     Console.WriteLine("Ingrese el numero de cedula:");
                     Ja_cedula = Console.ReadLine();
 
+                    // Busca al cliente por número de cedula
                     for (int Ja_i = 0; Ja_i < Ja_Clientes.GetLength(0); Ja_i++)
                     {
                         if (Ja_Clientes[Ja_i, 0] == Ja_cedula)
@@ -168,6 +177,7 @@ class SistemaSeguros
                     }
                 } while (!Ja_ValdCedula);
 
+                // Verifica que el cliente no tenga otra póliza
                 bool Ja_PolDuplicada = false;
                 for (int Ja_i = 0; Ja_i < Ja_TotalPolizas; Ja_i++)
                 {
@@ -189,6 +199,7 @@ class SistemaSeguros
 
                 Ja_Bloqueo = false;
 
+                // Revisa si el cliente tiene alertas
                 foreach (int Ja_codigo in Ja_AlertasUAF[Ja_FilaCliente])
                 {
                     if (Ja_codigo == 404)
@@ -210,6 +221,7 @@ class SistemaSeguros
 
                 if (Ja_Bloqueo) { continue; }
 
+                // Selección del ramo del seguro
                 if (!Ja_Bloqueo)
                 {
                     Console.WriteLine("RAMOS DISPONIBLES");
@@ -237,6 +249,7 @@ class SistemaSeguros
                     double Ja_Capital;
                     bool Ja_ValdCapital;
 
+                    // Datos para calcular la prima
                     do
                     {
                         Console.Write("Ingrese el Capital Asegurado: ");
@@ -266,6 +279,7 @@ class SistemaSeguros
                         }
                     } while (!Ja_ValdTasa || Ja_Tasa <= 0);
 
+                    // Cálculo de los valores de la póliza
                     double Ja_PrimaBase = (Ja_Capital * Ja_Tasa) / 100;
                     double Ja_SuperBancos = Ja_PrimaBase * 0.035;
                     double Ja_SeguroCampesino = Ja_PrimaBase * 0.005;
@@ -279,6 +293,7 @@ class SistemaSeguros
                     double Ja_IVA = Ja_Subtotal * 0.12;
                     double Ja_Total = Ja_Subtotal + Ja_IVA;
 
+                    // Guarda la póliza en los arreglos
                     Ja_PolCliente[Ja_TotalPolizas] = Ja_FilaCliente;
                     Ja_PolRamo[Ja_TotalPolizas] = Ja_RamoSeleccionado;
                     Ja_PolCapital[Ja_TotalPolizas] = Ja_Capital;
@@ -288,6 +303,7 @@ class SistemaSeguros
 
                     int Ja_IdxGuardado = Ja_TotalPolizas - 1;
 
+                    // Muestra el comprobante de la póliza
                     Console.Clear();
                     Console.WriteLine("\n==============================================");
                     Console.WriteLine("\t    FACTURA DE PÓLIZA");
@@ -314,6 +330,7 @@ class SistemaSeguros
         } while (ja_ValdContinuar);
     }
 
+    // Metodo para registrar un siniestro
     static void RegistarSiniestro()
     {
         char Ja_Continuar;
@@ -324,6 +341,7 @@ class SistemaSeguros
 
         do
         {
+            //Pregunta si desea ingresar un siniestro
             Console.WriteLine("Desea registrar un siniestro (s/n):");
             bool ja_ValdSN = char.TryParse(Console.ReadLine().ToLower(), out Ja_Continuar);
 
@@ -340,6 +358,7 @@ class SistemaSeguros
 
             if (Ja_Continuar == 's')
             {
+                //Revisa si hay espacio para registrar un siniestro
                 if (Ja_TotalSiniestros >= Ja_MaxSiniestros)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -349,11 +368,13 @@ class SistemaSeguros
                     continue;
                 }
 
+                //Pide numero de cedula
                 Console.WriteLine("Ingrese el numero de cedula del cliente:");
                 Ja_cedula = Console.ReadLine();
                 Ja_PolEncontrada = false;
                 Ja_IdxPoliza = -1;
 
+                // Busca la póliza del cliente
                 for (int Ja_i = 0; Ja_i < Ja_TotalPolizas; Ja_i++)
                 {
                     if (Ja_Clientes[Ja_PolCliente[Ja_i], 0] == Ja_cedula)
@@ -364,6 +385,7 @@ class SistemaSeguros
                     }
                 }
 
+                //Si no encuentra una poliza asociada a la cedula lo envia al menu
                 if (!Ja_PolEncontrada)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -372,6 +394,7 @@ class SistemaSeguros
                     continue;
                 }
 
+                //Muestra la poliza
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Póliza encontrada");
                 Console.ResetColor();
@@ -388,6 +411,7 @@ class SistemaSeguros
 
                 do
                 {
+                    // Solicita el valor del reclamo
                     Console.Write("Ingrese el monto del reclamo: ");
                     Ja_ValdMonto = double.TryParse(Console.ReadLine(), out Ja_MontoReclamo);
 
@@ -399,6 +423,7 @@ class SistemaSeguros
                     }
                 } while (!Ja_ValdMonto || Ja_MontoReclamo <= 0);
 
+                // Si el reclamo supera el capital disponible, se rechaza
                 if (Ja_MontoReclamo > Ja_PolCapRemte[Ja_IdxPoliza])
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -446,6 +471,7 @@ class SistemaSeguros
 
                 do
                 {
+                    // Solicita y calcula el deducible y el valor a pagar
                     Console.Write("Ingrese el porcentaje de deducible (0 - 100): ");
                     Ja_ValdDeducible = double.TryParse(Console.ReadLine(), out Ja_PorcDeducible);
 
@@ -457,12 +483,14 @@ class SistemaSeguros
                     }
                 } while (!Ja_ValdDeducible || Ja_PorcDeducible < 0 || Ja_PorcDeducible > 100);
 
+                // Descuenta el monto utilizado del capital disponible
                 double Ja_ValorDeducible = Ja_MontoReclamo * (Ja_PorcDeducible / 100);
                 double Ja_MontoAPagar = Ja_MontoReclamo - Ja_ValorDeducible;
                 double Ja_MontoConsumido = Ja_MontoReclamo;
 
                 Ja_PolCapRemte[Ja_IdxPoliza] = Ja_PolCapRemte[Ja_IdxPoliza] - Ja_MontoConsumido;
 
+                // Guarda el siniestro
                 Ja_SinPoliza[Ja_TotalSiniestros] = Ja_IdxPoliza;
                 Ja_SinMontoReclamo[Ja_TotalSiniestros] = Ja_MontoReclamo;
                 Ja_SinDeducible[Ja_TotalSiniestros] = Ja_PorcDeducible;
@@ -474,6 +502,7 @@ class SistemaSeguros
                 Ja_TotalSiniestros++;
                 int Ja_IdxGuardado = Ja_TotalSiniestros - 1;
 
+                // Muestra el comprobante del siniestro
                 Console.Clear();
                 Console.WriteLine("\n==============================================");
                 Console.WriteLine("\t  COMPROBANTE DE SINIESTRO");
@@ -495,15 +524,19 @@ class SistemaSeguros
                 Console.ResetColor();
                 Console.WriteLine($"Siniestros en memoria: {Ja_TotalSiniestros} / {Ja_MaxSiniestros}");
 
+                // Envía el monto consumido al módulo de reaseguro
                 Contrato_Reaseguro(Ja_SinCapConsumido[Ja_IdxGuardado]);
             }
 
         } while (ja_ValdContinuar);
     }
 
+    //Metodo del reaseguro
+    // Calcula cómo se reparte el capital entre las reaseguradoras
     static void Contrato_Reaseguro(double Ja_Capital)
     {
 
+        // Variables para guardar los montos del reparto
         double Ja_MontoRetencion = 0;
         double Ja_MontoContrato = 0;
         double Ja_MontoFacultativo = 0;
@@ -518,6 +551,7 @@ class SistemaSeguros
 
         double Ja_MayorLimite = 0;
 
+        // Busca la posición de cada tipo de reaseguro
         for (int Ja_i = 0; Ja_i < Ja_CodigoGeneral.Length; Ja_i++)
         {
             if (Ja_CodigoGeneral[Ja_i] == "0010")
@@ -527,6 +561,7 @@ class SistemaSeguros
             }
         }
 
+        // Busca el contrato con el mayor límite permitido
         Ja_MayorLimite = 0;
         for (int Ja_i = 0; Ja_i < Ja_CodigoGeneral.Length; Ja_i++)
         {
@@ -549,25 +584,30 @@ class SistemaSeguros
             }
         }
 
+        // Verifica si todo el capital entra en retención
         if (Ja_Capital <= Ja_LimiteValorativo[Ja_IndiceRetencion])
         {
             Ja_MontoRetencion = Ja_Capital;
         }
         else
         {
+            // El capital supera la retención
             Ja_AlertaRetencion = true;
 
             Ja_MontoRetencion = Ja_LimiteValorativo[Ja_IndiceRetencion];
             double Ja_CapitalRestante = Ja_Capital - Ja_MontoRetencion;
 
+            // Calcula el monto para el contrato automático
             Ja_MontoContrato = (Ja_Capital * Ja_LimitePorcentual[Ja_IndiceContrato]) / 100;
 
+            // Verifica que no pase el límite del contrato
             if (Ja_MontoContrato > Ja_LimiteValorativo[Ja_IndiceContrato])
             {
                 Ja_MontoContrato = Ja_LimiteValorativo[Ja_IndiceContrato];
                 Ja_AlertaContrato = true;
             }
 
+            // Evita repartir más dinero del disponible
             if (Ja_MontoContrato > Ja_CapitalRestante)
             {
                 Ja_MontoContrato = Ja_CapitalRestante;
@@ -575,6 +615,7 @@ class SistemaSeguros
 
             Ja_CapitalRestante = Ja_CapitalRestante - Ja_MontoContrato;
 
+            // Si queda dinero, pasa al facultativo
             if (Ja_CapitalRestante > 0)
             {
                 Ja_MontoFacultativo = Ja_CapitalRestante;
@@ -584,12 +625,13 @@ class SistemaSeguros
 
         double Ja_TotalRepartido = 0;
 
+        // Muestra el resultado del reparto
         MostrarReaseguro(Ja_Capital, Ja_MontoRetencion, Ja_MontoContrato, Ja_MontoFacultativo,
             Ja_AlertaRetencion, Ja_AlertaContrato, Ja_AlertaFacultativo,
             Ja_IndiceRetencion, Ja_IndiceContrato, Ja_IndiceFacultativo, ref Ja_TotalRepartido);
     }
 
-
+    // Presenta el reparto realizado
     static void MostrarReaseguro(double Ja_Capital, double Ja_MontoRetencion, double Ja_MontoContrato, double Ja_MontoFacultativo,
     bool Ja_AlertaRetencion, bool Ja_AlertaContrato, bool Ja_AlertaFacultativo,
     int Ja_IndiceRetencion, int Ja_IndiceContrato, int Ja_IndiceFacultativo, ref double Ja_Total)
@@ -599,6 +641,7 @@ class SistemaSeguros
         Console.WriteLine("\t\tREPARTO DE REASEGURO");
         Console.WriteLine("===================================================");
 
+        // Muestra las alertas generadas
         if (Ja_AlertaRetencion)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -617,16 +660,17 @@ class SistemaSeguros
             Console.WriteLine("ALERTA: El capital restante pasa a Facultativo.");
             Console.ResetColor();
         }
-
+        // Encabezado de la tabla
         Console.WriteLine("-----------------------------------------------");
         Console.WriteLine("Codigo\tNombre\t\tPorcentaje\tMonto");
         Console.WriteLine("-----------------------------------------------");
-
+        // Muestra la parte de retención
         double Ja_PorcentajeRetencion = (Ja_MontoRetencion / Ja_Capital) * 100;
         Console.WriteLine(
             $"{Ja_CodigoGeneral[Ja_IndiceRetencion]}\t{Ja_NombreReaseguradora[Ja_IndiceRetencion]}\t{Ja_PorcentajeRetencion:F0}%\t\t${Ja_MontoRetencion:F2}"
         );
 
+        // Muestra el contrato automático
         if (Ja_MontoContrato > 0)
         {
             double Ja_Porcentaje;
@@ -634,6 +678,7 @@ class SistemaSeguros
             Console.WriteLine($"{ Ja_CodigoGeneral[Ja_IndiceContrato]}\t{Ja_NombreReaseguradora[Ja_IndiceContrato]}\t{Ja_Porcentaje:F0}%\t\t${Ja_MontoContrato:F2}");
         }
 
+        // Muestra el facultativo
         if (Ja_MontoFacultativo > 0)
         {
             double Ja_Porcentaje;
@@ -643,11 +688,13 @@ class SistemaSeguros
 
         Console.WriteLine("-----------------------------------------------");
 
+        // Calcula el total repartido
         Ja_Total = Ja_MontoRetencion + Ja_MontoContrato + Ja_MontoFacultativo;
 
         Console.WriteLine($"Capital: ${Ja_Capital:F2}");
         Console.WriteLine($"Total Repartido: ${Ja_Total:F2}");
 
+        // Comprueba que todo el capital fue repartido
         if (Math.Abs(Ja_Total - Ja_Capital) < 0.01)
         {
             Console.ForegroundColor = ConsoleColor.Green;
