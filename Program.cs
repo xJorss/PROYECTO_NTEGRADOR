@@ -1,5 +1,4 @@
 ﻿using System;
-
 class SistemaSeguros
 {
     static string[,] Ja_Clientes =
@@ -49,6 +48,13 @@ class SistemaSeguros
     static double[] Ja_SinCapConsumido = new double[Ja_MaxSiniestros];
     static int Ja_TotalSiniestros = 0;
     static string[] Ja_SinEstado = new string[Ja_MaxSiniestros];
+
+    static int[] Ja_CodigoReaseguradora = { 1, 2, 3, 4, 5, 6, 7 };
+    static string[] Ja_NombreReaseguradora = { "Seguros Pichincha", "Equinoccial Seguros", "Latina Seguros", "Hispana Re", "Confianza Seguros", "Continental Re", "Retencion" };
+    static int[] Ja_TipoGrupo = { 1, 2, 1, 1, 2, 2, 3 };
+    static string[] Ja_CodigoGeneral = { "0020", "0030", "0020", "0020", "0030", "0030", "0010" };
+    static double[] Ja_LimitePorcentual = { 20, 0, 30, 35, 0, 0, 10 };
+    static double[] Ja_LimiteValorativo = { 30000, 0, 20000, 50000, 0, 0, 500000 };
 
 
     static void Main(string[] args)
@@ -398,12 +404,12 @@ class SistemaSeguros
 
                     Ja_SinPoliza[Ja_TotalSiniestros] = Ja_IdxPoliza;
                     Ja_SinMontoReclamo[Ja_TotalSiniestros] = Ja_MontoReclamo;
-                    Ja_SinDeducible[Ja_TotalSiniestros] = 0;   
-                    Ja_SinPagoNeto[Ja_TotalSiniestros] = 0;   
-                    Ja_SinCapConsumido[Ja_TotalSiniestros] = 0;   
-                    Ja_SinEstado[Ja_TotalSiniestros] = "Rechazado";   
+                    Ja_SinDeducible[Ja_TotalSiniestros] = 0;
+                    Ja_SinPagoNeto[Ja_TotalSiniestros] = 0;
+                    Ja_SinCapConsumido[Ja_TotalSiniestros] = 0;
+                    Ja_SinEstado[Ja_TotalSiniestros] = "Rechazado";
 
-                    Ja_TotalSiniestros++;   
+                    Ja_TotalSiniestros++;
 
                     int Ja_IdxRechazado = Ja_TotalSiniestros - 1;
 
@@ -428,7 +434,7 @@ class SistemaSeguros
                     Console.ResetColor();
                     Console.WriteLine($"Siniestros en memoria: {Ja_TotalSiniestros} / {Ja_MaxSiniestros}");
 
-                    continue;   
+                    continue;
                 }
 
                 double Ja_PorcDeducible;
@@ -461,7 +467,7 @@ class SistemaSeguros
 
                 Ja_SinEstado[Ja_TotalSiniestros] = "Aprobado";
 
-                Ja_TotalSiniestros++;  
+                Ja_TotalSiniestros++;
                 int Ja_IdxGuardado = Ja_TotalSiniestros - 1;
 
                 Console.Clear();
@@ -484,8 +490,172 @@ class SistemaSeguros
                 Console.WriteLine($"Estado:\t\t\t{Ja_SinEstado[Ja_IdxGuardado]}");
                 Console.ResetColor();
                 Console.WriteLine($"Siniestros en memoria: {Ja_TotalSiniestros} / {Ja_MaxSiniestros}");
+
+                Contrato_Reaseguro(Ja_SinCapConsumido[Ja_IdxGuardado]);
             }
 
         } while (ja_ValdContinuar);
     }
+
+    static void Contrato_Reaseguro(double Ja_Capital)
+    {
+
+        double Ja_MontoRetencion = 0;
+        double Ja_MontoContrato = 0;
+        double Ja_MontoFacultativo = 0;
+
+        bool Ja_AlertaRetencion = false;
+        bool Ja_AlertaContrato = false;
+        bool Ja_AlertaFacultativo = false;
+
+        int Ja_IndiceRetencion = -1;
+        int Ja_IndiceContrato = -1;
+        int Ja_IndiceFacultativo = -1;
+
+        double Ja_MayorLimite = 0;
+
+        for (int Ja_i = 0; Ja_i < Ja_CodigoGeneral.Length; Ja_i++)
+        {
+            if (Ja_CodigoGeneral[Ja_i] == "0010")
+            {
+                Ja_IndiceRetencion = Ja_i;
+                break;
+            }
+        }
+
+        Ja_MayorLimite = 0;
+        for (int Ja_i = 0; Ja_i < Ja_CodigoGeneral.Length; Ja_i++)
+        {
+            if (Ja_CodigoGeneral[Ja_i] == "0020")
+            {
+                if (Ja_LimiteValorativo[Ja_i] > Ja_MayorLimite)
+                {
+                    Ja_MayorLimite = Ja_LimiteValorativo[Ja_i];
+                    Ja_IndiceContrato = Ja_i;
+                }
+            }
+        }
+
+        for (int Ja_i = 0; Ja_i < Ja_CodigoGeneral.Length; Ja_i++)
+        {
+            if (Ja_CodigoGeneral[Ja_i] == "0030")
+            {
+                Ja_IndiceFacultativo = Ja_i;
+                break;
+            }
+        }
+
+        if (Ja_Capital <= Ja_LimiteValorativo[Ja_IndiceRetencion])
+        {
+            Ja_MontoRetencion = Ja_Capital;
+        }
+        else
+        {
+            Ja_AlertaRetencion = true;
+
+            Ja_MontoRetencion = Ja_LimiteValorativo[Ja_IndiceRetencion];
+            double Ja_CapitalRestante = Ja_Capital - Ja_MontoRetencion;
+
+            Ja_MontoContrato = (Ja_Capital * Ja_LimitePorcentual[Ja_IndiceContrato]) / 100;
+
+            if (Ja_MontoContrato > Ja_LimiteValorativo[Ja_IndiceContrato])
+            {
+                Ja_MontoContrato = Ja_LimiteValorativo[Ja_IndiceContrato];
+                Ja_AlertaContrato = true;
+            }
+
+            if (Ja_MontoContrato > Ja_CapitalRestante)
+            {
+                Ja_MontoContrato = Ja_CapitalRestante;
+            }
+
+            Ja_CapitalRestante = Ja_CapitalRestante - Ja_MontoContrato;
+
+            if (Ja_CapitalRestante > 0)
+            {
+                Ja_MontoFacultativo = Ja_CapitalRestante;
+                Ja_AlertaFacultativo = true;
+            }
+        }
+
+        double Ja_TotalRepartido = 0;
+
+        MostrarReaseguro(Ja_Capital, Ja_MontoRetencion, Ja_MontoContrato, Ja_MontoFacultativo,
+            Ja_AlertaRetencion, Ja_AlertaContrato, Ja_AlertaFacultativo,
+            Ja_IndiceRetencion, Ja_IndiceContrato, Ja_IndiceFacultativo, ref Ja_TotalRepartido);
+    }
+
+
+    static void MostrarReaseguro(double Ja_Capital, double Ja_MontoRetencion, double Ja_MontoContrato, double Ja_MontoFacultativo,
+    bool Ja_AlertaRetencion, bool Ja_AlertaContrato, bool Ja_AlertaFacultativo,
+    int Ja_IndiceRetencion, int Ja_IndiceContrato, int Ja_IndiceFacultativo, ref double Ja_Total)
+    {
+        Console.WriteLine();
+        Console.WriteLine("===================================================");
+        Console.WriteLine("\t\tREPARTO DE REASEGURO");
+        Console.WriteLine("===================================================");
+
+        if (Ja_AlertaRetencion)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("ALERTA: Capital supera el limite de retencion.");
+            Console.ResetColor();
+        }
+        if (Ja_AlertaContrato)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("ALERTA: Capital supera el limite del contrato.");
+            Console.ResetColor();
+        }
+        if (Ja_AlertaFacultativo)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("ALERTA: El capital restante pasa a Facultativo.");
+            Console.ResetColor();
+        }
+
+        Console.WriteLine("-----------------------------------------------");
+        Console.WriteLine("Codigo\tNombre\t\tPorcentaje\tMonto");
+        Console.WriteLine("-----------------------------------------------");
+
+        double Ja_PorcentajeRetencion = (Ja_MontoRetencion / Ja_Capital) * 100;
+        Console.WriteLine(
+            $"{Ja_CodigoGeneral[Ja_IndiceRetencion]}\t{Ja_NombreReaseguradora[Ja_IndiceRetencion]}\t{Ja_PorcentajeRetencion:F0}%\t\t${Ja_MontoRetencion:F2}"
+        );
+
+        if (Ja_MontoContrato > 0)
+        {
+            double Ja_Porcentaje;
+            Ja_Porcentaje = (Ja_MontoContrato * 100) / Ja_Capital;
+            Console.WriteLine($"{ Ja_CodigoGeneral[Ja_IndiceContrato]}\t{Ja_NombreReaseguradora[Ja_IndiceContrato]}\t{Ja_Porcentaje:F0}%\t\t${Ja_MontoContrato:F2}");
+        }
+
+        if (Ja_MontoFacultativo > 0)
+        {
+            double Ja_Porcentaje;
+            Ja_Porcentaje = (Ja_MontoFacultativo * 100) / Ja_Capital;
+            Console.WriteLine($"{Ja_CodigoGeneral[Ja_IndiceFacultativo]}\t {Ja_NombreReaseguradora[Ja_IndiceFacultativo]}\t{Ja_Porcentaje:F0}%\t\t${Ja_MontoFacultativo:F2}");
+        }
+
+        Console.WriteLine("-----------------------------------------------");
+
+        Ja_Total = Ja_MontoRetencion + Ja_MontoContrato + Ja_MontoFacultativo;
+
+        Console.WriteLine($"Capital: ${Ja_Capital:F2}");
+        Console.WriteLine($"Total Repartido: ${Ja_Total:F2}");
+
+        if (Math.Abs(Ja_Total - Ja_Capital) < 0.01)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Reparto realizado correctamente.");
+            Console.ResetColor();
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Error en el reparto del capital.");
+            Console.ResetColor();
+        }
+    }
+
 }
