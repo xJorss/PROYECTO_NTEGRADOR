@@ -1,6 +1,7 @@
 ﻿using System;
 class SistemaSeguros
 {
+    // Lista de clientes registrados
     static string[,] Ja_Clientes =
     {
         { "0942091391", "Josh Falcones"  },
@@ -15,10 +16,12 @@ class SistemaSeguros
         { "0942091390", "Diana Arreaga"  }
     };
 
+    // Ramos disponibles para emitir polizas
     static string[] JA_Ramos =
     {    "Incendio", "Robo", "Vehiculo", "Trasporte"
     };
 
+    // Alertas reportadas por la UAF para cada cliente
     static int[][] Ja_AlertasUAF =
     {
         new int[] { 200, 404, 200 },
@@ -32,6 +35,7 @@ class SistemaSeguros
         new int[] { 999, 404      },
         new int[] { 200, 500, 200 }
     };
+
 
     const int Ja_MaxPolizas = 100;
     static int[] Ja_PolCliente = new int[Ja_MaxPolizas];
